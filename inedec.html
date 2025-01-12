@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Compression</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+   
+  <h1>Compress Image</h1>
+  <p>take home project 12/01/2025</p>
+  <input type="file" id="fileInput" accept="image/*">
+  <button id="downloadButton" style="display: none;">Download Compressed Image</button>
+  <canvas id="canvas" style="display: none;"></canvas>
+  <script>
+    document.getElementById("fileInput").addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        compressImage(file, 0.7, (compressedDataURL) => {
+          // Display download button and set the compressed image as the download target
+          const downloadButton = document.getElementById("downloadButton");
+          downloadButton.style.display = "block";
+          downloadButton.onclick = () => {
+            const a = document.createElement("a");
+            a.href = compressedDataURL;
+            a.download = "compressed-image.jpg";
+            a.click();
+          };
+        });
+      }
+    });
+
+    function compressImage(file, quality, callback) {
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+
+        img.onload = () => {
+          // Create a canvas and draw the image on it
+          const canvas = document.getElementById("canvas");
+          const ctx = canvas.getContext("2d");
+
+          // Set canvas dimensions to the image dimensions
+          canvas.width = img.width;
+          canvas.height = img.height;
+
+          // Draw the image on the canvas
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          // Compress the image and convert to JPEG
+          const compressedDataURL = canvas.toDataURL("image/jpeg", quality);
+
+          // Call the callback with the compressed image data
+          callback(compressedDataURL);
+        };
+      };
+
+      reader.readAsDataURL(file);
+    }
+  </script>
+  
+</body>
+</html>
